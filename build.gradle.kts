@@ -25,6 +25,6 @@
 val stringfogVersion: String = (findProperty("stringfogVersion") as String?) ?: "2.3.0"
 
 allprojects {
-    group = "com.github.Pangu-Immortal.StringFogPro"
+    group = "com.github.kr0fff.StringFogPro"
     version = stringfogVersion
 }

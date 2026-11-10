@@ -13,11 +13,34 @@
  */
 
 plugins {
-    `kotlin-dsl`
+    // NOTE: intentionally NOT `kotlin-dsl` — it leaks gradle-kotlin-dsl onto the
+    // consumer buildscript classpath and breaks AGP's type-safe accessor generation
+    // (e.g. android {} becomes "unresolved"). Plain kotlin("jvm") + java-gradle-plugin
+    // builds the same plugin without that leak.
+    kotlin("jvm") version "2.4.21"
+    `java-gradle-plugin`
     `maven-publish`
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+    }
+}
+
 dependencies {
+    // Gradle core API (org.gradle.api.Plugin/Project) — provided by the host at runtime.
+    compileOnly(gradleApi())
+    // kotlin-stdlib: compile against it but DON'T publish it as a runtime/compile dep
+    // (kotlin.stdlib.default.dependency=false). The Gradle host provides it at runtime,
+    // so it never leaks onto the consumer buildscript classpath.
+    compileOnly(kotlin("stdlib"))
+
     // 构建期加密复用运行时算法实现（XorFog/AesFog/StringFogRuntime.defaultKey）。
     implementation(project(":stringfog"))
 

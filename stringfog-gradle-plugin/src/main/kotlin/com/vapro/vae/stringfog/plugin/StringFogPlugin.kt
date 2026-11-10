@@ -39,6 +39,7 @@ class StringFogPlugin : Plugin<Project> {
         ext.randomKeyPerString.convention(false)
         ext.randomKeyLength.convention(16)
         ext.mappingEnabled.convention(false)
+        ext.scope.convention("project")
 
         // 全局命令行 kill-switch（优先级最高，非法值按默认启用处理）
         val cliEnabled = project.findProperty("va.stringfog.enabled")
@@ -103,9 +104,13 @@ class StringFogPlugin : Plugin<Project> {
             ""
         }
 
+        val instrScope = when (ext.scope.get().lowercase()) {
+            "all" -> InstrumentationScope.ALL
+            else -> InstrumentationScope.PROJECT
+        }
         variant.instrumentation.transformClassesWith(
             StringFogFactory::class.java,
-            InstrumentationScope.PROJECT
+            instrScope
         ) { params ->
             // DSL → params：以 provider 链接，保证惰性求值与配置缓存兼容
             params.algorithm.set(ext.algorithm)

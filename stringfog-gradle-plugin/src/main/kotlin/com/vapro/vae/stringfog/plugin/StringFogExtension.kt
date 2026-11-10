@@ -52,4 +52,11 @@ abstract class StringFogExtension {
 
     /** 映射输出：构建期输出「明文→密文」映射文件到 build/outputs/stringfog/。默认 false。 */
     abstract val mappingEnabled: Property<Boolean>
+
+    /**
+     * Instrumentation scope: "project" (default, only this module's classes) or "all"
+     * ("all" covers dependency / KMP shared classes — apply on the application module
+     * to encrypt the whole app in one place).
+     */
+    abstract val scope: Property<String>
 }
